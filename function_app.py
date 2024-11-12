@@ -6,24 +6,28 @@ import pyodbc
 import time
 from datetime import datetime, timedelta
 
-# Voeg paden toe aan sys.path voor dagelijkse, maandelijkse en werknemers scripts
-sys.path.append(os.path.join(os.path.dirname(__file__), 'cultivar_dashboard', 'cultivar_dashboard_dagelijks'))
-from cultivar_dashboard.cultivar_dashboard_dagelijks.main import main as daily_main
-
-sys.path.append(os.path.join(os.path.dirname(__file__), 'cultivar_dashboard', 'cultivar_dashboard_maandelijks'))
-from cultivar_dashboard.cultivar_dashboard_maandelijks.main import main as monthly_main
-
-sys.path.append(os.path.join(os.path.dirname(__file__), 'productiviteits_dashboard', 'productiviteits_dashboard_geregistreerde_uren', 'productiviteits_dashboard_geregistreerde_uren_dagelijks'))
-from productiviteits_dashboard.productiviteits_dashboard_geregistreerde_uren.productiviteits_dashboard_geregistreerde_uren_dagelijks.main import main as productivity_daily_main
-
-sys.path.append(os.path.join(os.path.dirname(__file__), 'productiviteits_dashboard', 'productiviteits_dashboard_geregistreerde_uren', 'productiviteits_dashboard_geregistreerde_uren_maandelijks'))
-from productiviteits_dashboard.productiviteits_dashboard_geregistreerde_uren.productiviteits_dashboard_geregistreerde_uren_maandelijks.main import main as productivity_monthly_main
-
-sys.path.append(os.path.join(os.path.dirname(__file__), 'productiviteits_dashboard', 'productiviteits_dashboard_werknemers'))
-from productiviteits_dashboard.productiviteits_dashboard_werknemers.main import main as productivity_weekly_main
-
 # Configureer logging
 logging.basicConfig(level=logging.INFO)
+
+# Verkrijg het absolute pad naar de root van je project
+project_root = os.path.dirname(os.path.abspath(__file__))
+
+# Voeg absolute paden toe aan sys.path voor dagelijkse, maandelijkse en werknemers scripts
+sys.path.append(os.path.join(project_root, 'cultivar_dashboard', 'cultivar_dashboard_dagelijks'))
+from cultivar_dashboard.cultivar_dashboard_dagelijks.main import main as daily_main
+
+sys.path.append(os.path.join(project_root, 'cultivar_dashboard', 'cultivar_dashboard_maandelijks'))
+from cultivar_dashboard.cultivar_dashboard_maandelijks.main import main as monthly_main
+
+sys.path.append(os.path.join(project_root, 'productiviteits_dashboard', 'productiviteits_dashboard_geregistreerde_uren', 'productiviteits_dashboard_geregistreerde_uren_dagelijks'))
+from productiviteits_dashboard.productiviteits_dashboard_geregistreerde_uren.productiviteits_dashboard_geregistreerde_uren_dagelijks.main import main as productivity_daily_main
+
+sys.path.append(os.path.join(project_root, 'productiviteits_dashboard', 'productiviteits_dashboard_geregistreerde_uren', 'productiviteits_dashboard_geregistreerde_uren_maandelijks'))
+from productiviteits_dashboard.productiviteits_dashboard_geregistreerde_uren.productiviteits_dashboard_geregistreerde_uren_maandelijks.main import main as productivity_monthly_main
+
+sys.path.append(os.path.join(project_root, 'productiviteits_dashboard', 'productiviteits_dashboard_werknemers'))
+from productiviteits_dashboard.productiviteits_dashboard_werknemers.main import main as productivity_weekly_main
+
 
 # Azure Function App object
 app = func.FunctionApp()
