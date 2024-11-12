@@ -1,5 +1,5 @@
 {
-    "scriptFile": "main.py",  
+    "scriptFile": "productiviteits_dashboard_geregistreerde_uren_dagelijks.py",  
     "bindings": [
       {
         "name": "ProductiviteitsDashboardUrenDagelijksTimer",
