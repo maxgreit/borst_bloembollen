@@ -85,7 +85,7 @@ def run_script(script_main_function, script_type):
         
     except Exception as e:
         # Log specifieke fouten en het type script waar de fout optrad
-        logging.error(f"FOUTMELDING | {script_type} script is mislukt: {e}")
+        logging.error(f"FOUTMELDING | {script_type} script is jammer genoeg mislukt: {e}")
         logging.info(f"{script_type} | Script geëindigd met fouten")
     finally:
         # Dit deel wordt altijd uitgevoerd, ook als er een fout is
