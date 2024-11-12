@@ -14,20 +14,19 @@ project_root = os.path.dirname(os.path.abspath(__file__))
 
 # Voeg absolute paden toe aan sys.path voor dagelijkse, maandelijkse en werknemers scripts
 sys.path.append(os.path.join(project_root, 'cultivar_dashboard', 'cultivar_dashboard_dagelijks'))
-from cultivar_dashboard.cultivar_dashboard_dagelijks.main import main as daily_main
+from cultivar_dashboard.cultivar_dashboard_dagelijks.cultivar_dashboard_dagelijks import main as daily_main
 
 sys.path.append(os.path.join(project_root, 'cultivar_dashboard', 'cultivar_dashboard_maandelijks'))
-from cultivar_dashboard.cultivar_dashboard_maandelijks.main import main as monthly_main
+from cultivar_dashboard.cultivar_dashboard_maandelijks.cultivar_dashboard_maandelijks import main as monthly_main
 
 sys.path.append(os.path.join(project_root, 'productiviteits_dashboard', 'productiviteits_dashboard_geregistreerde_uren', 'productiviteits_dashboard_geregistreerde_uren_dagelijks'))
-from productiviteits_dashboard.productiviteits_dashboard_geregistreerde_uren.productiviteits_dashboard_geregistreerde_uren_dagelijks.main import main as productivity_daily_main
+from productiviteits_dashboard.productiviteits_dashboard_geregistreerde_uren.productiviteits_dashboard_geregistreerde_uren_dagelijks.productiviteits_dashboard_geregistreerde_uren_dagelijks import main as productivity_daily_main
 
 sys.path.append(os.path.join(project_root, 'productiviteits_dashboard', 'productiviteits_dashboard_geregistreerde_uren', 'productiviteits_dashboard_geregistreerde_uren_maandelijks'))
-from productiviteits_dashboard.productiviteits_dashboard_geregistreerde_uren.productiviteits_dashboard_geregistreerde_uren_maandelijks.main import main as productivity_monthly_main
+from productiviteits_dashboard.productiviteits_dashboard_geregistreerde_uren.productiviteits_dashboard_geregistreerde_uren_maandelijks.productiviteits_dashboard_geregistreerde_uren_maandelijks import main as productivity_monthly_main
 
 sys.path.append(os.path.join(project_root, 'productiviteits_dashboard', 'productiviteits_dashboard_werknemers'))
-from productiviteits_dashboard.productiviteits_dashboard_werknemers.main import main as productivity_weekly_main
-
+from productiviteits_dashboard.productiviteits_dashboard_werknemers.productiviteits_dashboard_werknemers import main as productivity_weekly_main
 
 # Azure Function App object
 app = func.FunctionApp()
