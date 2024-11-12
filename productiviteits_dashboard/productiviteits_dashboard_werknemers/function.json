@@ -1,0 +1,12 @@
+{
+    "scriptFile": "__init__.py",  
+    "bindings": [
+      {
+        "name": "ProductiviteitsDashboardWerknemersTimer",
+        "type": "timerTrigger",
+        "direction": "in",
+        "schedule": "0 40 4 * * 1"  
+      }
+    ]
+  }
+  
