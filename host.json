@@ -1,12 +1,5 @@
 {
   "version": "2.0",
-  "functions": [
-    "CultivarDashboardDagelijks",
-    "CultivarDashboardMaandelijks",
-    "ProductiviteitsDashboardUrenDagelijks",
-    "ProductiviteitsDashboardUrenMaandelijks",
-    "ProductiviteitsDashboardWerknemers"
-  ],
   "logging": {
     "applicationInsights": {
       "samplingSettings": {
