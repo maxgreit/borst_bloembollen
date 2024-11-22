@@ -13,56 +13,50 @@ logging.basicConfig(level=logging.INFO)
 project_root = os.path.dirname(os.path.abspath(__file__))
 
 # Voeg absolute paden toe aan sys.path voor dagelijkse, maandelijkse en werknemers scripts
-sys.path.append(os.path.join(project_root, 'cultivar_dashboard', 'cultivar_dashboard_dagelijks'))
-from cultivar_dashboard.cultivar_dashboard_dagelijks.cultivar_dashboard_dagelijks import main as daily_main
+sys.path.append(os.path.join(project_root, 'bulbmanager'))
+from bulbmanager.bm_main import main as bm_main
+from bulbmanager.bm_modules.year_determination import recent_years, past_years
 
-sys.path.append(os.path.join(project_root, 'cultivar_dashboard', 'cultivar_dashboard_maandelijks'))
-from cultivar_dashboard.cultivar_dashboard_maandelijks.cultivar_dashboard_maandelijks import main as monthly_main
+sys.path.append(os.path.join(project_root, 'dyflexis', 'registered_hours'))
+from dyflexis.registered_hours.hour_main import main as hour_main
+from dyflexis.registered_hours.hour_modules.year_determination import this_year, last_year
 
-sys.path.append(os.path.join(project_root, 'productiviteits_dashboard', 'productiviteits_dashboard_geregistreerde_uren', 'productiviteits_dashboard_geregistreerde_uren_dagelijks'))
-from productiviteits_dashboard.productiviteits_dashboard_geregistreerde_uren.productiviteits_dashboard_geregistreerde_uren_dagelijks.productiviteits_dashboard_geregistreerde_uren_dagelijks import main as productivity_daily_main
-
-sys.path.append(os.path.join(project_root, 'productiviteits_dashboard', 'productiviteits_dashboard_geregistreerde_uren', 'productiviteits_dashboard_geregistreerde_uren_maandelijks'))
-from productiviteits_dashboard.productiviteits_dashboard_geregistreerde_uren.productiviteits_dashboard_geregistreerde_uren_maandelijks.productiviteits_dashboard_geregistreerde_uren_maandelijks import main as productivity_monthly_main
-
-sys.path.append(os.path.join(project_root, 'productiviteits_dashboard', 'productiviteits_dashboard_werknemers'))
-from productiviteits_dashboard.productiviteits_dashboard_werknemers.productiviteits_dashboard_werknemers import main as productivity_weekly_main
+sys.path.append(os.path.join(project_root, 'dyflexis', 'employees'))
+from dyflexis.employees.empl_main import main as employees_main
 
 # Azure Function App object
 app = func.FunctionApp()
 
-# Dagelijkse run (elke dag om 4 uur 's nachts)
-@app.function_name(name="CultivarDashboardDagelijks")
-@app.schedule(schedule="0 0 4 * * *", arg_name="CultivarDashboardDagelijksTimer", run_on_startup=False, use_monitor=True)
-def Cultivar_dagelijks(CultivarDashboardDagelijksTimer: func.TimerRequest) -> None:
-    
-    run_script(daily_main, "Cultivar Dashboard | Dagelijks")
+@app.function_name(name="BmDagelijks")
+@app.schedule(schedule="0 0 4 * * *", arg_name="BmDagelijkseTimer", run_on_startup=False, use_monitor=True)
+def bm_dagelijks(BmDagelijkseTimer: func.TimerRequest) -> None:
+    teeltjaren = recent_years()
+    run_script(bm_main, "Bulbmanager | Dagelijks", teeltjaren)
 
-# Maandelijkse run (elke eerste dag van de maand om 4 uur 's nachts)
-@app.function_name(name="CultivarDashboardMaandelijks")
-@app.schedule(schedule="0 10 4 1 * *", arg_name="CultivarDashboardMaandelijksTimer", run_on_startup=False, use_monitor=True)
-def Cultivar_maandelijkse(CultivarDashboardMaandelijksTimer: func.TimerRequest) -> None:
-    run_script(monthly_main, "Cultivar Dashboard | Maandelijks")
+@app.function_name(name="BmWekelijks")
+@app.schedule(schedule="0 10 4 1 * *", arg_name="BmWekelijkseTimer", run_on_startup=False, use_monitor=True)
+def bm_wekelijks(BmWekelijkseTimer: func.TimerRequest) -> None:
+    teeltjaren = past_years()
+    run_script(bm_main, "Bulbmanager | Wekelijks", teeltjaren)
 
-# Productiviteitsmeting - dagelijks (elke dag om 4 uur 's nachts)
-@app.function_name(name="ProductiviteitsDashboardUrenDagelijks")
-@app.schedule(schedule="0 20 4 * * *", arg_name="ProductiviteitsDashboardUrenDagelijksTimer", run_on_startup=False, use_monitor=True)
-def Productiviteit_urenregistratie_dagelijks(ProductiviteitsDashboardUrenDagelijksTimer: func.TimerRequest) -> None:
-    run_script(productivity_daily_main, "Productiviteits Dashboard Uren | Dagelijks")
+@app.function_name(name="UrenDagelijks")
+@app.schedule(schedule="0 20 4 * * *", arg_name="UrenDagelijkseTimer", run_on_startup=False, use_monitor=True)
+def uren_dagelijks(UrenDagelijkseTimer: func.TimerRequest) -> None:
+    datum_range = this_year()
+    run_script(hour_main, "Dyflexis | Geregistreerde Uren | Dagelijks", datum_range)
 
-# Productiviteitsmeting - maandelijks (elke eerste dag van de maand om 4 uur 's nachts)
-@app.function_name(name="ProductiviteitsDashboardUrenMaandelijks")
-@app.schedule(schedule="0 30 4 1 * *", arg_name="ProductiviteitsDashboardUrenMaandelijksTimer", run_on_startup=False, use_monitor=True)
-def Productiviteit_urenregistratie_maandelijks(ProductiviteitsDashboardUrenMaandelijksTimer: func.TimerRequest) -> None:
-    run_script(productivity_monthly_main, "Productiviteits Dashboard Uren | Maandelijks")
+@app.function_name(name="UrenMaandelijks")
+@app.schedule(schedule="0 30 4 1 * *", arg_name="UrenMaandelijksTimer", run_on_startup=False, use_monitor=True)
+def uren_maandelijks(UrenMaandelijksTimer: func.TimerRequest) -> None:
+    datum_range = last_year()
+    run_script(hour_main, "Productiviteits Dashboard Uren | Maandelijks", datum_range)
 
-# Productiviteitsmeting - werknemers (elke maandag om 4 uur 's nachts)
-@app.function_name(name="ProductiviteitsDashboardWerknemers")
-@app.schedule(schedule="0 40 4 * * 1", arg_name="ProductiviteitsDashboardWerknemersTimer", run_on_startup=False, use_monitor=True)
-def Productiviteit_werknemers_wekelijks(ProductiviteitsDashboardWerknemersTimer: func.TimerRequest) -> None:
-    run_script(productivity_weekly_main, "Productiviteits Dashboard Werknemers")
+@app.function_name(name="WerknemersWekelijks")
+@app.schedule(schedule="0 40 4 * * 1", arg_name="WerknemersWekelijkseTimer", run_on_startup=False, use_monitor=True)
+def werknemers_wekelijks(WerknemersWekelijkseTimer: func.TimerRequest) -> None:
+    run_script(employees_main, "Productiviteits Dashboard Werknemers")
 
-def run_script(script_main_function, script_type):
+def run_script(script_main_function, script_type, script_input=None):
     try:
         logging.info(f"Start {script_type} script")
         
@@ -71,7 +65,7 @@ def run_script(script_main_function, script_type):
         
         # Log het begin van de hoofdfunctie
         logging.info(f"{script_type} | Uitvoeren van de main-functie")
-        script_main_function()
+        script_main_function(script_input)
 
         # Log het succesvol afronden van de main-functie
         logging.info(f"{script_type} | Main-functie succesvol afgerond")
