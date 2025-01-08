@@ -21,7 +21,6 @@ def determine_script_id(greit_connection_string, klant, bron, script):
         print(f"Verbinding met database geslaagd")
         cursor = database_conn.cursor()
         latest_script_id = fetch_current_script_id(cursor)
-        log(greit_connection_string, klant, bron, f"ScriptID: {latest_script_id}", script, script_id)
         database_conn.close()
 
     if latest_script_id:
