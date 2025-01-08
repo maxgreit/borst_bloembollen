@@ -17,12 +17,12 @@ def determine_script_id(greit_connection_string, klant, bron, script):
     try:
         database_conn = connect_to_database(greit_connection_string)
     except Exception as e:
-        logging.info(f"Verbinding met database mislukt, foutmelding: {e}")
+        print(f"Verbinding met database mislukt, foutmelding: {e}")
     if database_conn:
-        logging.info(f"Verbinding met database geslaagd")
+        print(f"Verbinding met database geslaagd")
         cursor = database_conn.cursor()
         latest_script_id = fetch_current_script_id(cursor)
-        logging.info(f"ScriptID: {latest_script_id}")
+        print(f"ScriptID: {latest_script_id}")
         database_conn.close()
 
     if latest_script_id:
@@ -30,7 +30,6 @@ def determine_script_id(greit_connection_string, klant, bron, script):
     else:
         script_id = 1
         
-    logging.info(f"ScriptID: {script_id}")
     log(greit_connection_string, klant, bron, f"Script gestart", script, script_id)
     
     return script_id
