@@ -1,5 +1,5 @@
 from w_modules.database import connect_to_database
-from w_modules.log import log
+import logging
 import time
 
 def fetch_current_script_id(cursor):
@@ -12,15 +12,16 @@ def fetch_current_script_id(cursor):
 
     return highest_script_id
 
-def determine_script_id(greit_connection_string, klant, bron, script):
+def determine_script_id(greit_connection_string):
     try:
         database_conn = connect_to_database(greit_connection_string)
     except Exception as e:
-        print(f"Verbinding met database mislukt, foutmelding: {e}")
+        logging.info(f"Verbinding met database mislukt, foutmelding: {e}")
     if database_conn:
-        print(f"Verbinding met database geslaagd")
+        logging.info(f"Verbinding met database geslaagd")
         cursor = database_conn.cursor()
         latest_script_id = fetch_current_script_id(cursor)
+        logging.info(f"ScriptID: {latest_script_id}")
         database_conn.close()
 
     if latest_script_id:
@@ -28,7 +29,7 @@ def determine_script_id(greit_connection_string, klant, bron, script):
     else:
         script_id = 1
         
-    log(greit_connection_string, klant, bron, f"Script gestart", script, script_id)
+    logging.info(f"ScriptID: {script_id}")
     
     return script_id
 
@@ -44,16 +45,16 @@ def fetch_all_connection_strings(cursor):
     connection_dict = {row[1]: (row[2], row[3]) for row in rows}  
     return connection_dict
 
-def create_connection_dict(greit_connection_string, klant, bron, script, script_id):
+def create_connection_dict(greit_connection_string):
     max_retries = 3
     retry_delay = 5
     
     try:
         database_conn = connect_to_database(greit_connection_string)
     except Exception as e:
-        log(greit_connection_string, klant, bron, f"Verbinding met database mislukt, foutmelding: {e}", script, script_id)
+        logging.info(f"Verbinding met database mislukt, foutmelding: {e}")
     if database_conn:
-        log(greit_connection_string, klant, bron, f"Verbinding met database geslaagd", script, script_id)
+        logging.info(f"Verbinding met database opnieuw geslaagd")
         cursor = database_conn.cursor()
         connection_dict = None
         for attempt in range(max_retries):
@@ -65,19 +66,15 @@ def create_connection_dict(greit_connection_string, klant, bron, script, script_
                 time.sleep(retry_delay)
         database_conn.close()
         if connection_dict:
-
-            # Start logging
-            log(greit_connection_string, klant, bron, f"Ophalen connectiestrings gestart", script, script_id)
+            logging.info(f"Ophalen connectiestrings gelukt")
         else:
             # Foutmelding logging
-            print(f"FOUTMELDING | Ophalen connectiestrings mislukt na meerdere pogingen")
-            log(greit_connection_string, klant, bron, f"FOUTMELDING | Ophalen connectiestrings mislukt na meerdere pogingen", script, script_id)
+            logging.error(f"Ophalen connectiestrings mislukt na meerdere pogingen")
     else:
         # Foutmelding logging
-        print(f"FOUTMELDING | Verbinding met database mislukt na meerdere pogingen")
-        log(greit_connection_string, klant, bron, f"FOUTMELDING | Verbinding met database mislukt na meerdere pogingen", script, script_id)
+        logging.error(f"Verbinding met database mislukt na meerdere pogingen")
     
-    log(greit_connection_string, klant, bron, "Configuratie dictionary opgehaald", script, script_id)
+    logging.info("Configuratie dictionary opgehaald")
     
     return connection_dict
 
@@ -108,14 +105,14 @@ def fetch_configurations(cursor):
 
     return configuratie_dict
 
-def create_config_dict(klant_connection_string, greit_connection_string, klant, bron, script, script_id):
+def create_config_dict(klant_connection_string):
     max_retries = 3
     retry_delay = 5
     
     try:
         database_conn = connect_to_database(klant_connection_string)
     except Exception as e:
-        log(greit_connection_string, klant, bron, f"Verbinding met database mislukt, foutmelding: {e}", script, script_id)
+        logging.info(f"Verbinding met database mislukt, foutmelding: {e}")
 
     if database_conn:
         cursor = database_conn.cursor()
@@ -133,18 +130,25 @@ def create_config_dict(klant_connection_string, greit_connection_string, klant, 
         database_conn.close()
     
         if configuratie_dict:
-            # Start logging
-            log(greit_connection_string, klant, bron, f"Ophalen configuratiegegevens gestart", script, script_id)
+            logging.info(f"Ophalen configuratiegegevens gelukt")
         else:
             # Foutmelding logging
-            print(f"FOUTMELDING | Ophalen connectiestrings mislukt na meerdere pogingen")
-            log(greit_connection_string, klant, bron, f"FOUTMELDING | Ophalen configuratiengegevens mislukt na meerdere pogingen", script, script_id)
+            logging.error(f"Ophalen configuratiengegevens mislukt na meerdere pogingen")
+
     else:
         # Foutmelding logging
-        print(f"FOUTMELDING | Verbinding met database mislukt na meerdere pogingen")
-        log(greit_connection_string, klant, bron, f"FOUTMELDING | Verbinding met database mislukt na meerdere pogingen", script, script_id)
+        logging.error(f"Verbinding met database mislukt na meerdere pogingen")
     
     return configuratie_dict
+
+def retrieve_token_url(dict):
+    for configuratie, waarde in dict.items():
+        if configuratie == 'Token':
+            token = waarde
+        elif configuratie == 'Base_url':
+            base_url = waarde
+    
+    return token, base_url
 
 def retrieve_token_url_system(dict):
     for configuratie, waarde in dict.items():

@@ -1,4 +1,4 @@
-from pm_modules.log import log
+import logging
 
 fust_details = {
     "OmsPartij": "Partij",
@@ -106,7 +106,7 @@ def transform_columns(df, column_mapping):
 
     return df
 
-def apply_mapping(df, tabelnaam, greit_connection_string, klant, bron, script, script_id):
+def apply_mapping(df, tabelnaam):
     # Kolom mapping
     column_mapping = {
         'Partij_maat': partij_maat_details,
@@ -120,12 +120,11 @@ def apply_mapping(df, tabelnaam, greit_connection_string, klant, bron, script, s
             # Transformeer de kolommen
             try:
                 transformed_df = transform_columns(df, mapping)
-                print(f"Kolommen getransformeerd")
-                log(greit_connection_string, klant, bron, f"Mapping van kolommen correct uitgevoerd", script, script_id, tabelnaam)
+                logging.info(f"Kolommen getransformeerd")
                 
                 return transformed_df
             except Exception as e:
-                print(f"FOUTMELDING | Kolommen transformeren mislukt: {e}")
-                log(greit_connection_string, klant, bron, f"FOUTMELDING | Kolommen transformeren mislukt: {e}", script, script_id, tabelnaam)
+                logging.error(f"Kolommen transformeren mislukt: {e}")
+
             
             

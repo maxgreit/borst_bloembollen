@@ -1,4 +1,4 @@
-from pm_modules.database import connect_to_database
+from plant_modules.database import connect_to_database
 import logging
 import time
 
@@ -12,7 +12,7 @@ def fetch_current_script_id(cursor):
 
     return highest_script_id
 
-def determine_script_id(greit_connection_string):
+def determine_script_id(greit_connection_string, klant, bron, script):
     try:
         database_conn = connect_to_database(greit_connection_string)
     except Exception as e:
@@ -45,7 +45,7 @@ def fetch_all_connection_strings(cursor):
     connection_dict = {row[1]: (row[2], row[3]) for row in rows}  
     return connection_dict
 
-def create_connection_dict(greit_connection_string):
+def create_connection_dict(greit_connection_string, klant, bron, script, script_id):
     max_retries = 3
     retry_delay = 5
     
@@ -66,6 +66,8 @@ def create_connection_dict(greit_connection_string):
                 time.sleep(retry_delay)
         database_conn.close()
         if connection_dict:
+
+            # Start logging
             logging.info(f"Ophalen connectiestrings gelukt")
         else:
             # Foutmelding logging
@@ -105,7 +107,7 @@ def fetch_configurations(cursor):
 
     return configuratie_dict
 
-def create_config_dict(klant_connection_string):
+def create_config_dict(klant_connection_string, greit_connection_string, klant, bron, script, script_id):
     max_retries = 3
     retry_delay = 5
     
@@ -130,22 +132,20 @@ def create_config_dict(klant_connection_string):
         database_conn.close()
     
         if configuratie_dict:
-            logging.info(f"Ophalen configuratiegegevens gelukt")
+            # Start logging
+            logging.info(f"Ophalen configuratiegegevens gestart")
         else:
             # Foutmelding logging
-            logging.error(f"Ophalen configuratiengegevens mislukt na meerdere pogingen")
-
+            logging.error(f"Ophalen connectiestrings mislukt na meerdere pogingen")
     else:
         # Foutmelding logging
         logging.error(f"Verbinding met database mislukt na meerdere pogingen")
     
     return configuratie_dict
 
-def retrieve_token_url(dict):
-    for configuratie, waarde in dict.items():
-        if configuratie == 'Token':
-            token = waarde
-        elif configuratie == 'Base_url':
-            base_url = waarde
+def retrieve_variables(config_dict):
+    url = config_dict['Bulbmanager']['URL']
+    username = config_dict['Bulbmanager']['Username']
+    password = config_dict['Bulbmanager']['Password']
     
-    return token, base_url
+    return url, username, password

@@ -1,11 +1,10 @@
-from fust_modules.log import log
 import pandas as pd
 import requests
+import logging
 
-def get_request(greit_connection_string, base_url, extensie, token, tabelnaam, teeltjaar, klant, bron, script, script_id):
+def get_request(base_url, extensie, token, tabelnaam, teeltjaar):
     # Logging
-    print(f"Start tabel {tabelnaam} voor teeltjaar {teeltjaar}")
-    log(greit_connection_string, klant, bron, f"Start GET Requests", script, script_id, tabelnaam)
+    logging.info(f"Start tabel {tabelnaam} voor teeltjaar {teeltjaar}")
 
     # Endpoint, url en headers instellen
     endpoint = f'{extensie}?Tjr={teeltjaar}'
@@ -19,8 +18,7 @@ def get_request(greit_connection_string, base_url, extensie, token, tabelnaam, t
     try:
         response = requests.get(url, headers=headers)
     except Exception as e:
-        print(f"FOUTMELDING | GET Request mislukt: {e}")
-        log(greit_connection_string, klant, bron, f"FOUTMELDING | GET Request mislukt: {e}", script, script_id, tabelnaam)
+        logging.error(f"GET Request mislukt: {e}")
         return None
 
     # Data response
@@ -29,22 +27,19 @@ def get_request(greit_connection_string, base_url, extensie, token, tabelnaam, t
 
     return df
 
-def execute_get_request(greit_connection_string, base_url, extensie, token, tabelnaam, teeltjaar, klant, bron, script, script_id):
+def execute_get_request(base_url, extensie, token, tabelnaam, teeltjaar):
     try:
-        df = get_request(greit_connection_string, base_url, extensie, token, tabelnaam, teeltjaar, klant, bron, script, script_id)
+        df = get_request(base_url, extensie, token, tabelnaam, teeltjaar)
     except Exception as e:
-        print(f"FOUTMELDING | Uitvoer GET Request mislukt: {e}")
-        log(greit_connection_string, klant, bron, f"FOUTMELDING | Uitvoer GET Request mislukt: {e}", script, script_id, tabelnaam)
+        logging.error(f"Uitvoer GET Request mislukt: {e}")
     
     # Dataframe check
     if df is None:
-        print(f"FOUTMELDING | Geen DataFrame geretourneerd")
-        log(greit_connection_string, klant, bron, f"FOUTMELDING | Geen DataFrame geretourneerd", script, script_id, tabelnaam)
+        logging.error(f"Geen DataFrame geretourneerd")
         return None
     
     if df.empty:
-        print(f"FOUTMELDING | DataFrame is leeg")
-        log(greit_connection_string, klant, bron, f"FOUTMELDING | DataFrame is leeg", script, script_id, tabelnaam)
+        logging.error(f"DataFrame is leeg")
         return df
     
     else:

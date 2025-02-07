@@ -23,7 +23,7 @@ def connect_to_database(connection_string):
     print("Kan geen verbinding maken met de database na meerdere pogingen.")
     return None
 
-def clear_table(connection_string, table, teeltjaar):
+def clear_table(connection_string, table, jaar):
     try:
         # Maak verbinding met de database
         connection = pyodbc.connect(connection_string)
@@ -31,16 +31,15 @@ def clear_table(connection_string, table, teeltjaar):
         
         # Probeer de tabel leeg te maken met TRUNCATE TABLE
         try:
-            cursor.execute(f"DELETE FROM {table} WHERE Teeltjaar = ?", teeltjaar)
+            cursor.execute(f"DELETE FROM {table} WHERE Jaar = ?", jaar)
         except pyodbc.Error as e:
-            logging.error(f"DELETE FROM {table} WHERE Teeltjaar = {teeltjaar} mislukt: {e}")
+            print(f"DELETE FROM {table} WHERE Jaar = {jaar} failed: {e}")
         
         # Commit de transactie
         connection.commit()
-        logging.info(f"Leeggooien succesvol uitgevoerd voor tabel {table}.")
+        print(f"Leeggooien succesvol uitgevoerd voor tabel {table}.")
     except pyodbc.Error as e:
-        logging.error(f"Fout bij het leegooien van tabel {table}: {e}")
-        
+        print(f"Fout bij het leegooien van tabel {table}: {e}")
     finally:
         # Sluit de cursor en verbinding
         cursor.close()
@@ -62,23 +61,23 @@ def write_to_database(df, tabel, connection_string, batch_size=1000):
             rows_added += len(batch_df)
             print(f"{rows_added} rijen toegevoegd aan de tabel tot nu toe...")
         
-        logging.info(f"DataFrame succesvol toegevoegd/bijgewerkt in de tabel: {tabel}")
+        print(f"DataFrame succesvol toegevoegd/bijgewerkt in de tabel: {tabel}")
     except Exception as e:
-        logging.error(f"Fout bij het toevoegen naar de database: {e}")
+        print(f"Fout bij het toevoegen naar de database: {e}")
 
 def empty_and_fill_table(df, tabelnaam, klant_connection_string, teeltjaar):
     # Tabel legen
     try:
         clear_table(klant_connection_string, tabelnaam, teeltjaar)
-        logging.info(f"Tabel {tabelnaam} voor teeltjaar {teeltjaar} leeg gemaakt")
-        
+        print(f"Tabel {tabelnaam} voor teeltjaar {teeltjaar} leeg gemaakt")
+        logging.info(f"Tabel leeg gemaakt voor teeltjaar {teeltjaar}")
     except Exception as e:
-        logging.error(f"FOUTMELDING | Tabel leeg maken mislukt: {e}")
+        logging.error(f"FOUTMELDING | Tabel leeg maken mislukt voor teeltjaar {teeltjaar}: {e}")
 
     # Tabel vullen
     try:
+        print(f"Volledige lengte {tabelnaam}: ", len(df))
         write_to_database(df, tabelnaam, klant_connection_string)
-        logging.info(f"Tabel {tabelnaam} voor teeltjaar {teeltjaar} gevuld")
-
+        logging.info(f"Tabel gevuld met {len(df)} rijen")
     except Exception as e:
-        logging.error(f"Tabel vullen mislukt: {e}")
+        logging.error(f"FOUTMELDING | Tabel vullen mislukt voor teeltjaar {teeltjaar}: {e}")

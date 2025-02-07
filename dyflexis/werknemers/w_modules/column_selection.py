@@ -1,4 +1,4 @@
-from w_modules.log import log
+import logging
 
 werknemers_columns = [
     "Werknemer_ID",
@@ -14,7 +14,7 @@ def select_columns(df, columns):
     # Controleer of de DataFrame leeg is
     if df.empty:
         # Retourneer een melding en None
-        print("De DataFrame is leeg. Retourneer een lege DataFrame met de juiste kolommen.")
+        logging.error("De DataFrame is leeg. Retourneer een lege DataFrame met de juiste kolommen.")
         return None
 
     # Selecteer de gewenste kolommen
@@ -22,7 +22,7 @@ def select_columns(df, columns):
 
     return df
 
-def apply_column_selection(df, greit_connection_string, tabelnaam, klant, bron, script, script_id):
+def apply_column_selection(df, tabelnaam):
 
     column_selection = {
     'Werknemers': werknemers_columns,
@@ -35,11 +35,9 @@ def apply_column_selection(df, greit_connection_string, tabelnaam, klant, bron, 
             # Kolommen selecteren
             try:
                 df = select_columns(df, selection)
-                print(f"Kolommen getransformeerd")
-                log(greit_connection_string, klant, bron, f"Juiste kolommen geselecteerd", script, script_id, tabelnaam)
+                logging.info(f"Kolommen getransformeerd")
             except Exception as e:
-                print(f"FOUTMELDING | Kolommen selecteren mislukt: {e}")
-                log(greit_connection_string, klant, bron, f"FOUTMELDING | Kolommen selecteren mislukt: {e}", script, script_id, tabelnaam)
+                logging.error(f"Kolommen selecteren mislukt: {e}")
     
     return df
 

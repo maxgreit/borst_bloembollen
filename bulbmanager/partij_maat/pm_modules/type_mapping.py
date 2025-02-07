@@ -1,7 +1,7 @@
-from pm_modules.log import log
 from pandas.errors import OutOfBoundsDatetime
 from decimal import Decimal
 import pandas as pd
+import logging
 
 fust_typing = {
     "Partij": "nvarchar",
@@ -197,11 +197,12 @@ def convert_column_types(df, column_types):
                 # zet dan die waarde op NaT.
                 df[column] = pd.NaT
         else:
+            logging.error(f"Kolom '{column}' niet gevonden in DataFrame.")
             raise ValueError(f"Kolom '{column}' niet gevonden in DataFrame.")
     
     return df
 
-def apply_conversion(df, tabelnaam, greit_connection_string, klant, bron, script, script_id):
+def apply_conversion(df, tabelnaam):
     column_typing = {
         'Partij_maat': partij_maat_typing,
         'Fust': fust_typing
@@ -214,12 +215,10 @@ def apply_conversion(df, tabelnaam, greit_connection_string, klant, bron, script
             # Type conversie
             try:
                 converted_df = convert_column_types(df, typing)
-                print(f"Kolommen type conversie")
-                log(greit_connection_string, klant, bron, f"Kolommen type conversie correct uitgevoerd", script, script_id, tabelnaam)
+                logging.info(f"Kolommen type conversie")
                 
                 return converted_df
             except Exception as e:
-                print(f"FOUTMELDING | Kolommen type conversie mislukt: {e}")
-                log(greit_connection_string, klant, bron, f"FOUTMELDING | Kolommen type conversie mislukt: {e}", script, script_id, tabelnaam)
+                logging.error(f"Kolommen type conversie mislukt: {e}")
                 
             
